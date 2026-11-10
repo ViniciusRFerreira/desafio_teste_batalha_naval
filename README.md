@@ -28,7 +28,7 @@ Repositório contendo a implementação em JavaScript e a suíte de **casos de t
 
 ## 🧪 Funcionamento dos Casos de Teste (`tests/batalhaNaval.test.js`)
 
-A suíte possui **10 casos de teste** divididos em 3 seções:
+A suíte possui **11 casos de teste** divididos em 3 seções:
 
 | ID | Caso de Teste | O que valida / Como funciona |
 | :--- | :--- | :--- |
@@ -42,6 +42,7 @@ A suíte possui **10 casos de teste** divididos em 3 seções:
 | **CT08** | Registro de `AGUA`, `IMPACTO` e `AFUNDOU` | Realiza um tiro na água, um tiro parcial no Destroier (`IMPACTO`) e o tiro final no Destroier (`AFUNDOU`), e confirma que ainda restam navios (`todosNaviosAfundados()` é `false`). |
 | **CT09** | Proibição de tiro repetido ou fora do mapa | Dispara duas vezes em `(5, 5)` e testa coordenadas fora de `0..9`, validando o bloqueio. |
 | **CT10** | Vitória ao afundar toda a frota (14 casas) | Ataca todas as coordenadas dos 4 navios e verifica que o 14º acerto retorna `{ resultado: 'VITORIA' }` e `todosNaviosAfundados() === true`. |
+| **CT11** | Consistência do encerramento e bloqueio pós-vitória | Confirma que `todosNaviosAfundados()` permanece `false` até o 13º acerto, muda para `true` apenas no 14º acerto, e bloqueia novos ataques após a vitória preservando o estado do tabuleiro. |
 
 ---
 
@@ -49,10 +50,10 @@ A suíte possui **10 casos de teste** divididos em 3 seções:
 
 O arquivo `src/batalhaNaval.js` usa `module.exports` para exportar `{ BatalhaNaval }`, importado nos testes com `require('../src/batalhaNaval')`.
 
-- `new BatalhaNaval(tamanho = 10)`: lança erro se o tamanho não for 10. Tem as propriedades `tamanho` e `tabuleiro` (matriz 10x10).
+- `new BatalhaNaval(tamanho = 10)`: lança erro se o tamanho não for 10. Tem as propriedades `tamanho` e `tabuleiro` (matriz 10x10, onde cada posição possui `atingida`).
 - `posicionarNavio(nome, linha, coluna, orientacao)`: os nomes são `'Porta-aviões'`, `'Encouraçado'`, `'Submarino'`, `'Destroier'` e `'Hidroavião'` (os dois últimos são o mesmo navio de 2 casas, só pode haver um). Orientação `'H'` ou `'V'`. Retorna um objeto com `coordenadas` (array) e `tamanho`.
 - `frotaCompleta()`: retorna `true` quando os 4 navios foram posicionados.
-- `atacar(linha, coluna)`: retorna `{ resultado, navio }`, com `resultado` sendo `'AGUA'`, `'IMPACTO'`, `'AFUNDOU'` ou `'VITORIA'` e `navio` com o nome do navio atingido (ou `null` na água). As coordenadas válidas vão de 0 a 9.
+- `atacar(linha, coluna)`: retorna `{ resultado, navio }`, com `resultado` sendo `'AGUA'`, `'IMPACTO'`, `'AFUNDOU'` ou `'VITORIA'` e `navio` com o nome do navio atingido (ou `null` na água). As coordenadas válidas vão de 0 a 9. Lança erro se a partida já tiver sido encerrada (`todosNaviosAfundados() === true`).
 - `todosNaviosAfundados()`: retorna `true` ou `false`.
 
 As mensagens de erro também são conferidas pelos testes; o texto exato esperado em cada caso está em `tests/batalhaNaval.test.js`.

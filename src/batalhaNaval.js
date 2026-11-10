@@ -114,6 +114,9 @@ class BatalhaNaval {
     if (!this.frotaCompleta()) {
       throw new Error('Toda a frota de 4 embarcações deve estar posicionada antes de iniciar os ataques');
     }
+    if (this.todosNaviosAfundados()) {
+      throw new Error('A partida já foi encerrada');
+    }
 
     this._validarCoordenada(linha, coluna);
 

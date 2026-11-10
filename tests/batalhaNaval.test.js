@@ -137,5 +137,32 @@ describe('Batalha Naval (Tabuleiro 10 x 10) - Suíte de Casos de Teste', () => {
       expect(ultimoDisparo).toEqual({ resultado: 'VITORIA', navio: 'Destroier' });
       expect(jogo.todosNaviosAfundados()).toBe(true);
     });
+
+    test('CT11 - Deve garantir que a vitória só ocorra após atingir todas as 14 casas da frota, bloquear ataques após a vitória e preservar o estado final', () => {
+      const jogo = criarJogoComFrotaPadrao();
+
+      // Afunda Porta-aviões (5 casas), Encouraçado (4 casas) e Submarino (3 casas) = 12 acertos
+      for (let c = 0; c < 5; c++) jogo.atacar(0, c);
+      expect(jogo.todosNaviosAfundados()).toBe(false);
+
+      for (let c = 0; c < 4; c++) jogo.atacar(2, c);
+      expect(jogo.todosNaviosAfundados()).toBe(false);
+
+      for (let c = 0; c < 3; c++) jogo.atacar(4, c);
+      expect(jogo.todosNaviosAfundados()).toBe(false);
+
+      // 13º acerto (1ª casa do Destroier): ainda não é vitória
+      expect(jogo.atacar(6, 0)).toEqual({ resultado: 'IMPACTO', navio: 'Destroier' });
+      expect(jogo.todosNaviosAfundados()).toBe(false);
+
+      // 14º acerto (última casa restante da frota): declara VITORIA
+      expect(jogo.atacar(6, 1)).toEqual({ resultado: 'VITORIA', navio: 'Destroier' });
+      expect(jogo.todosNaviosAfundados()).toBe(true);
+
+      // Tentar atacar novamente após a vitória deve ser bloqueado sem alterar o tabuleiro
+      expect(() => jogo.atacar(9, 9)).toThrow('A partida já foi encerrada');
+      expect(jogo.tabuleiro[9][9].atingida).toBe(false);
+      expect(jogo.todosNaviosAfundados()).toBe(true);
+    });
   });
 });
